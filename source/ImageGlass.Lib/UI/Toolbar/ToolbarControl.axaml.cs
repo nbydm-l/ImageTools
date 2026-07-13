@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Svg.Skia;
 using ImageGlass.Common;
@@ -42,6 +43,7 @@ public partial class ToolbarControl : PhControl
 
     // events
     public event TEventHandler<object, ToolbarItemClickEventArgs>? ItemClicked;
+    public event TEventHandler<object, ToolbarItemClickEventArgs>? ItemRightClicked;
 
     private readonly Dictionary<string, List<int>> _configBindingsMap = [];
     private readonly Dictionary<int, ToolbarItemMetadata> _metadataMap = [];
@@ -189,6 +191,12 @@ public partial class ToolbarControl : PhControl
     }
 
 
+    private void ToolbarButton_RightClicked(ToolbarButton sender, PointerPressedEventArgs e)
+    {
+        ItemRightClicked?.Invoke(sender, new ToolbarItemClickEventArgs(sender.VM));
+    }
+
+
     private void ToolbarItem_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (e.Property != Control.BoundsProperty) return;
@@ -324,6 +332,7 @@ public partial class ToolbarControl : PhControl
             if (item is ToolbarButton itemBtn)
             {
                 itemBtn.Click -= ToolbarButton_Click;
+                itemBtn.RightClicked -= ToolbarButton_RightClicked;
             }
         }
 
@@ -368,6 +377,7 @@ public partial class ToolbarControl : PhControl
                 var itemBtn = new ToolbarButton();
                 itemBtn.IsChecked = ComputeCheckState(vm);
                 itemBtn.Click += ToolbarButton_Click;
+                itemBtn.RightClicked += ToolbarButton_RightClicked;
                 itemEl = itemBtn;
             }
 

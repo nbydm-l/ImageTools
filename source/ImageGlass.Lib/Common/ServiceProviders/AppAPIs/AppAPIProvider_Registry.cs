@@ -102,6 +102,8 @@ public partial class AppAPIProvider
         { API.IG_SetLoadingOrderBy,             PhCommands.Create(IG_SetLoadingOrderBy) },
         { API.IG_SetLoadingOrderType,           PhCommands.Create(IG_SetLoadingOrderType) },
         { API.IG_SetColorChannels,              PhCommands.Create(IG_SetColorChannels) },
+        { API.IG_ToggleColorChannel,            PhCommands.Create(IG_ToggleColorChannel) },
+        { API.IG_SetSingleColorChannel,         PhCommands.Create(IG_SetSingleColorChannel) },
         { API.IG_OpenEditingApp,                PhCommands.Create(IG_OpenEditingAppAsync) },
         { API.IG_InvertColors,                  PhCommands.Create(IG_InvertColors) },
         { API.IG_ToggleImageAnimation,          PhCommands.Create(IG_ToggleImageAnimationAsync) },

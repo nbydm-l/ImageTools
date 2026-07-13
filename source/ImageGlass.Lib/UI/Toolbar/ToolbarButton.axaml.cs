@@ -16,8 +16,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using ImageGlass.Common;
+using ImageGlass.Common.Types;
 
 namespace ImageGlass.UI;
 
@@ -25,16 +27,37 @@ public partial class ToolbarButton : PhToolButton, IToolbarItem
 {
     public ToolbarItemModel VM => (ToolbarItemModel)DataContext!;
 
+    /// <summary>
+    /// Occurs when this button is right-clicked.
+    /// </summary>
+    public event TEventHandler<ToolbarButton, PointerPressedEventArgs>? RightClicked;
+
 
     public ToolbarButton()
     {
         DataContext = new ToolbarItemModel();
         InitializeComponent();
+
+        // Avalonia's Button class handlers mark PointerPressed as handled for all buttons,
+        // preventing right-click from ever reaching OnPointerPressed. Use tunnel routing
+        // with handledEventsToo so we capture it before the Button class handlers do.
+        AddHandler(PointerPressedEvent, PointerPressedHandler, RoutingStrategies.Tunnel, handledEventsToo: true);
     }
 
 
 
     #region Control Events
+
+    private void PointerPressedHandler(object? sender, PointerPressedEventArgs e)
+    {
+        var point = e.GetCurrentPoint(this);
+        if (point.Properties.IsRightButtonPressed)
+        {
+            e.Handled = true;
+            RightClicked?.Invoke(this, e);
+        }
+    }
+
 
     protected override void OnLoaded(RoutedEventArgs e)
     {

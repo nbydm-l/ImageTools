@@ -241,6 +241,22 @@ public partial class ToolbarItemModel : PhReactive, IJsonOnDeserialized
     } = null;
 
 
+    /// <summary>
+    /// Gets, sets the right-click action of toolbar button.
+    /// </summary>
+    public HotkeySingleAction? OnRightClick
+    {
+        get => field;
+        set
+        {
+            if (field == value) return;
+            field = value;
+
+            _ = OnPropertyChanged();
+        }
+    } = null;
+
+
     #endregion // JSON Properties
 
 

@@ -63,6 +63,10 @@
     "Play": "Play.svg",
     "Pause": "Pause.svg",
     "Export": "Export.svg",
-    "Exit": "Exit.svg"
+    "Exit": "Exit.svg",
+    "ColorChannelR": "ColorChannelR.svg",
+    "ColorChannelG": "ColorChannelG.svg",
+    "ColorChannelB": "ColorChannelB.svg",
+    "ColorChannelA": "ColorChannelA.svg"
   }
 }

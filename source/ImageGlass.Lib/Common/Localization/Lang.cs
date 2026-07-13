@@ -655,6 +655,10 @@ public class Lang
         new(LangId.Menu_MnuUnload, "Unload image"), //v9.0
 
         new(LangId.Menu_MnuViewChannels, "View channels"), //v7.0
+        new(LangId.Menu_MnuColorChannelR, "R"), //v10.0
+        new(LangId.Menu_MnuColorChannelG, "G"), //v10.0
+        new(LangId.Menu_MnuColorChannelB, "B"), //v10.0
+        new(LangId.Menu_MnuColorChannelA, "A"), //v10.0
         new(LangId.Menu_MnuLoadingOrders, "Loading orders"), //v8.0
         new(LangId.Menu_MnuInvertColors, "Invert colors"), // v9.3
         new(LangId.Menu_MnuToggleImageAnimation, "Start / stop animating image"), //v3.0

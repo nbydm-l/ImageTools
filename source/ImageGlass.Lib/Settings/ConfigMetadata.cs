@@ -76,6 +76,10 @@ public enum ConfigId
     EnableFileWatcher,
     EnableAutoOpenNewAddedImage,
     EnableDebug,
+    ColorChannelR,
+    ColorChannelG,
+    ColorChannelB,
+    ColorChannelA,
 
     #endregion // Boolean settings
 

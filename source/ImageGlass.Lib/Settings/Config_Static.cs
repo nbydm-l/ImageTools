@@ -269,6 +269,52 @@ public partial class Config
             Image = nameof(IgThemeIcon.Delete),
             Text = Lang.KeysMap[LangId.Menu_MnuMoveToRecycleBin],
             OnClick = new(LangId.Menu_MnuMoveToRecycleBin, API.IG_Delete),
+        },
+        ToolbarItemModel.Separator,
+
+        // color channel R
+        new() {
+            Id = "Btn_ColorChannelR",
+            Image = nameof(IgThemeIcon.ColorChannelR),
+            Text = Lang.KeysMap[LangId.Menu_MnuColorChannelR],
+            ShowText = true,
+            ConfigBinding = nameof(Config.ColorChannelR),
+            ConfigBindingValue = "True",
+            OnClick = new(LangId.Menu_MnuColorChannelR, API.IG_ToggleColorChannel, nameof(ColorChannels.R)),
+            OnRightClick = new(LangId.Menu_MnuColorChannelR, API.IG_SetSingleColorChannel, nameof(ColorChannels.R)),
+        },
+        // color channel G
+        new() {
+            Id = "Btn_ColorChannelG",
+            Image = nameof(IgThemeIcon.ColorChannelG),
+            Text = Lang.KeysMap[LangId.Menu_MnuColorChannelG],
+            ShowText = true,
+            ConfigBinding = nameof(Config.ColorChannelG),
+            ConfigBindingValue = "True",
+            OnClick = new(LangId.Menu_MnuColorChannelG, API.IG_ToggleColorChannel, nameof(ColorChannels.G)),
+            OnRightClick = new(LangId.Menu_MnuColorChannelG, API.IG_SetSingleColorChannel, nameof(ColorChannels.G)),
+        },
+        // color channel B
+        new() {
+            Id = "Btn_ColorChannelB",
+            Image = nameof(IgThemeIcon.ColorChannelB),
+            Text = Lang.KeysMap[LangId.Menu_MnuColorChannelB],
+            ShowText = true,
+            ConfigBinding = nameof(Config.ColorChannelB),
+            ConfigBindingValue = "True",
+            OnClick = new(LangId.Menu_MnuColorChannelB, API.IG_ToggleColorChannel, nameof(ColorChannels.B)),
+            OnRightClick = new(LangId.Menu_MnuColorChannelB, API.IG_SetSingleColorChannel, nameof(ColorChannels.B)),
+        },
+        // color channel A
+        new() {
+            Id = "Btn_ColorChannelA",
+            Image = nameof(IgThemeIcon.ColorChannelA),
+            Text = Lang.KeysMap[LangId.Menu_MnuColorChannelA],
+            ShowText = true,
+            ConfigBinding = nameof(Config.ColorChannelA),
+            ConfigBindingValue = "True",
+            OnClick = new(LangId.Menu_MnuColorChannelA, API.IG_ToggleColorChannel, nameof(ColorChannels.A)),
+            OnRightClick = new(LangId.Menu_MnuColorChannelA, API.IG_SetSingleColorChannel, nameof(ColorChannels.A)),
         }
     ];
 
@@ -505,6 +551,49 @@ public partial class Config
             Text = Lang.KeysMap[LangId.Menu_MnuExit],
             OnClick = new(LangId.Menu_MnuExit, API.IG_Exit),
         },
+        ToolbarItemModel.Separator,
+
+        // color channel R
+        new() {
+            Id = "Btn_ColorChannelR",
+            Image = nameof(IgThemeIcon.ColorChannelR),
+            Text = Lang.KeysMap[LangId.Menu_MnuColorChannelR],
+            ShowText = true,
+            ConfigBinding = nameof(Config.ColorChannelR),
+            ConfigBindingValue = "True",
+            OnClick = new(LangId.Menu_MnuColorChannelR, API.IG_ToggleColorChannel, nameof(ColorChannels.R)),
+            OnRightClick = new(LangId.Menu_MnuColorChannelR, API.IG_SetSingleColorChannel, nameof(ColorChannels.R)),
+        },
+        new() {
+            Id = "Btn_ColorChannelG",
+            Image = nameof(IgThemeIcon.ColorChannelG),
+            Text = Lang.KeysMap[LangId.Menu_MnuColorChannelG],
+            ShowText = true,
+            ConfigBinding = nameof(Config.ColorChannelG),
+            ConfigBindingValue = "True",
+            OnClick = new(LangId.Menu_MnuColorChannelG, API.IG_ToggleColorChannel, nameof(ColorChannels.G)),
+            OnRightClick = new(LangId.Menu_MnuColorChannelG, API.IG_SetSingleColorChannel, nameof(ColorChannels.G)),
+        },
+        new() {
+            Id = "Btn_ColorChannelB",
+            Image = nameof(IgThemeIcon.ColorChannelB),
+            Text = Lang.KeysMap[LangId.Menu_MnuColorChannelB],
+            ShowText = true,
+            ConfigBinding = nameof(Config.ColorChannelB),
+            ConfigBindingValue = "True",
+            OnClick = new(LangId.Menu_MnuColorChannelB, API.IG_ToggleColorChannel, nameof(ColorChannels.B)),
+            OnRightClick = new(LangId.Menu_MnuColorChannelB, API.IG_SetSingleColorChannel, nameof(ColorChannels.B)),
+        },
+        new() {
+            Id = "Btn_ColorChannelA",
+            Image = nameof(IgThemeIcon.ColorChannelA),
+            Text = Lang.KeysMap[LangId.Menu_MnuColorChannelA],
+            ShowText = true,
+            ConfigBinding = nameof(Config.ColorChannelA),
+            ConfigBindingValue = "True",
+            OnClick = new(LangId.Menu_MnuColorChannelA, API.IG_ToggleColorChannel, nameof(ColorChannels.A)),
+            OnRightClick = new(LangId.Menu_MnuColorChannelA, API.IG_SetSingleColorChannel, nameof(ColorChannels.A)),
+        }
     ];
 
     #endregion // Public static properties

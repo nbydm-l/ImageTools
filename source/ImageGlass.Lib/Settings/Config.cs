@@ -460,6 +460,30 @@ public partial class Config : PhReactive
         set => Set(ConfigId.EnableDebug, value);
     }
 
+    public bool ColorChannelR
+    {
+        get => Get(ConfigId.ColorChannelR, true);
+        set => Set(ConfigId.ColorChannelR, value);
+    }
+
+    public bool ColorChannelG
+    {
+        get => Get(ConfigId.ColorChannelG, true);
+        set => Set(ConfigId.ColorChannelG, value);
+    }
+
+    public bool ColorChannelB
+    {
+        get => Get(ConfigId.ColorChannelB, true);
+        set => Set(ConfigId.ColorChannelB, value);
+    }
+
+    public bool ColorChannelA
+    {
+        get => Get(ConfigId.ColorChannelA, true);
+        set => Set(ConfigId.ColorChannelA, value);
+    }
+
     #endregion // Boolean items
 
 

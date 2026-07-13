@@ -119,6 +119,7 @@ public partial class MainWindow : PhWindow
         // control events
         _status.Changed += Status_Changed;
         PART_MainView.PART_Toolbar.ItemClicked += PART_Toolbar_ItemClicked;
+        PART_MainView.PART_Toolbar.ItemRightClicked += PART_Toolbar_ItemRightClicked;
         PART_MainView.PART_Gallery.ItemClicked += PART_Gallery_ItemClicked;
     }
 
@@ -141,6 +142,7 @@ public partial class MainWindow : PhWindow
         _status.Dispose();
 
         PART_MainView.PART_Toolbar.ItemClicked -= PART_Toolbar_ItemClicked;
+        PART_MainView.PART_Toolbar.ItemRightClicked -= PART_Toolbar_ItemRightClicked;
         PART_MainView.PART_Gallery.ItemClicked -= PART_Gallery_ItemClicked;
 
 
@@ -250,6 +252,13 @@ public partial class MainWindow : PhWindow
     private void PART_Toolbar_ItemClicked(object sender, ToolbarItemClickEventArgs e)
     {
         _ = Core.API.RunActionAsync(e.VM.OnClick);
+    }
+
+
+    private void PART_Toolbar_ItemRightClicked(object sender, ToolbarItemClickEventArgs e)
+    {
+        if (e.VM.OnRightClick is not null)
+            _ = Core.API.RunActionAsync(e.VM.OnRightClick);
     }
 
 

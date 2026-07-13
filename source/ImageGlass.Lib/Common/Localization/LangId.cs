@@ -297,6 +297,10 @@ public enum LangId
     Menu_MnuUnload,
 
     Menu_MnuViewChannels,
+    Menu_MnuColorChannelR,
+    Menu_MnuColorChannelG,
+    Menu_MnuColorChannelB,
+    Menu_MnuColorChannelA,
     Menu_MnuLoadingOrders,
 
     Menu_MnuInvertColors,

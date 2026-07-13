@@ -63,5 +63,9 @@ public enum IgThemeIcon
     WindowFit,
     ZoomIn,
     ZoomOut,
+    ColorChannelR,
+    ColorChannelG,
+    ColorChannelB,
+    ColorChannelA,
 }
 

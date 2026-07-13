@@ -1696,6 +1696,7 @@ public partial class AppAPIProvider
                 _ = Viewer.FlipImage(Core.ImageTransform.Flips, false);
             }
 
+            SyncColorChannelConfig(channels);
             Viewer.Refresh(resetZoom: false);
         }
         else
@@ -1704,6 +1705,85 @@ public partial class AppAPIProvider
                 Core.Lang[LangId._InvalidAction],
                 Core.Lang[LangId.Menu_MnuViewChannels]);
         }
+    }
+
+
+    /// <summary>
+    /// Toggles the given color channel.
+    /// </summary>
+    public void IG_ToggleColorChannel(string? channelsStr)
+    {
+        if (!Enum.TryParse<ColorChannels>(channelsStr, out var channel))
+            throw new ArgumentException($"'{channelsStr}' is not a valid color channel.", nameof(channelsStr));
+
+        IG_ToggleColorChannel(channel);
+    }
+
+
+    /// <summary>
+    /// Toggles the given color channel.
+    /// </summary>
+    public static void IG_ToggleColorChannel(ColorChannels channel)
+    {
+        if (Viewer.SourceKind == PhotoSource.None || Core.IsBusy) return;
+
+        var newChannels = Core.ColorChannels ^ channel;
+
+        // ensure at least one RGB channel is always active
+        if ((newChannels & ColorChannels.RGB) == 0)
+            newChannels |= channel;
+
+        if (Viewer.FilterColorChannels(newChannels, false))
+        {
+            Core.ColorChannels = newChannels;
+            SyncColorChannelConfig(newChannels);
+            Viewer.Refresh(resetZoom: false);
+        }
+    }
+
+
+    /// <summary>
+    /// Sets a single color channel (exclusive), or restores RGBA if already exclusive.
+    /// </summary>
+    public void IG_SetSingleColorChannel(string? channelsStr)
+    {
+        if (!Enum.TryParse<ColorChannels>(channelsStr, out var channel))
+            throw new ArgumentException($"'{channelsStr}' is not a valid color channel.", nameof(channelsStr));
+
+        IG_SetSingleColorChannel(channel);
+    }
+
+
+    /// <summary>
+    /// Sets a single color channel (exclusive), or restores RGBA if already exclusive.
+    /// </summary>
+    public static void IG_SetSingleColorChannel(ColorChannels channel)
+    {
+        if (Viewer.SourceKind == PhotoSource.None || Core.IsBusy) return;
+
+        // if already showing only this channel, restore RGBA
+        var newChannels = Core.ColorChannels == channel
+            ? ColorChannels.RGBA
+            : channel;
+
+        if (Viewer.FilterColorChannels(newChannels, false))
+        {
+            Core.ColorChannels = newChannels;
+            SyncColorChannelConfig(newChannels);
+            Viewer.Refresh(resetZoom: false);
+        }
+    }
+
+
+    /// <summary>
+    /// Synchronizes Config color-channel properties with the active channels.
+    /// </summary>
+    private static void SyncColorChannelConfig(ColorChannels channels)
+    {
+        Core.Config.ColorChannelR = channels.HasFlag(ColorChannels.R);
+        Core.Config.ColorChannelG = channels.HasFlag(ColorChannels.G);
+        Core.Config.ColorChannelB = channels.HasFlag(ColorChannels.B);
+        Core.Config.ColorChannelA = channels.HasFlag(ColorChannels.A);
     }
 
 
