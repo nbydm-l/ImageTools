@@ -251,6 +251,9 @@ public enum LangId
     Menu_MnuViewPreviousFrame,
     Menu_MnuViewFirstFrame,
     Menu_MnuViewLastFrame,
+
+    Menu_MnuMarkPhoto,
+    Menu_MnuToggleMarkedPhoto,
     #endregion // Main Menu > Navigation
 
 

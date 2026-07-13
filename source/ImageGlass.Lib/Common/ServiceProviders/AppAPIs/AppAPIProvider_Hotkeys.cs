@@ -76,6 +76,8 @@ public partial class AppAPIProvider
         new(LangId.Menu_MnuGoTo,                 API.IG_Goto,                Key.F),
         new(LangId.Menu_MnuGoToFirst,            API.IG_GotoFirst,           Key.Home),
         new(LangId.Menu_MnuGoToLast,             API.IG_GotoLast,            Key.End),
+        new(LangId.Menu_MnuMarkPhoto,            API.IG_MarkPhoto,           Hotkey.Ctrl, Key.K),
+        new(LangId.Menu_MnuToggleMarkedPhoto,    API.IG_ToggleMarkedPhoto,   Key.K),
         new(LangId.Menu_MnuViewNextFrame,        API.IG_ViewNextFrame,       Hotkey.Ctrl, Key.Right),
         new(LangId.Menu_MnuViewPreviousFrame,    API.IG_ViewPreviousFrame,   Hotkey.Ctrl, Key.Left),
         new(LangId.Menu_MnuViewFirstFrame,       API.IG_ViewFirstFrame,      Hotkey.Ctrl, Key.Up),

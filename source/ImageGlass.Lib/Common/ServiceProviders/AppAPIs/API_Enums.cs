@@ -55,6 +55,9 @@ public enum API
     IG_ViewFirstFrame,
     IG_ViewLastFrame,
 
+    IG_MarkPhoto,
+    IG_ToggleMarkedPhoto,
+
     // Menu > Zoom
     IG_CustomZoom,
     IG_SetZoom,

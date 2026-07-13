@@ -613,6 +613,8 @@ public class Lang
         new(LangId.Menu_MnuViewPreviousFrame, "View previous frame"),
         new(LangId.Menu_MnuViewFirstFrame, "View first frame"),
         new(LangId.Menu_MnuViewLastFrame, "View last frame"),
+        new(LangId.Menu_MnuMarkPhoto, "Mark photo"), //v10
+        new(LangId.Menu_MnuToggleMarkedPhoto, "Toggle between marked and current photo"), //v10
         #endregion // Main Menu > Navigation
 
         #region Main Menu > Zoom

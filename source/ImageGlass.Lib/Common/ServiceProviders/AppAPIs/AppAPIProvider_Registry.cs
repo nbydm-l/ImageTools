@@ -69,6 +69,8 @@ public partial class AppAPIProvider
 
         { API.IG_ViewByStep,            PhCommands.Create(IG_ViewByStep) },
         { API.IG_ViewByIndex,           PhCommands.Create(IG_ViewByIndex) },
+        { API.IG_MarkPhoto,             PhCommands.Create(IG_MarkPhoto) },
+        { API.IG_ToggleMarkedPhoto,     PhCommands.Create(IG_ToggleMarkedPhoto) },
 
 
         // Zoom

@@ -42,7 +42,7 @@ namespace ImageGlass.Common;
 
 public static class Core
 {
-    public static readonly AppInstance AppInstance = new AppInstance("IG_APP"); // MacOS has length limit
+    public static readonly AppInstance AppInstance = new AppInstance("IT_APP"); // MacOS has length limit
 
     public static event EventHandler? LanguageChanged;
     public static event EventHandler<ThemePackChangedEventArgs>? ThemeChanged;

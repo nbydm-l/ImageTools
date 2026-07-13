@@ -33,6 +33,7 @@ using ImageGlass.UI;
 using ImageGlass.UI.Viewer;
 using ImageGlass.UI.Windowing;
 using ImageGlass.Windows;
+using SkiaSharp;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Immutable;
@@ -67,6 +68,10 @@ public partial class AppAPIProvider
     private bool _windowMaximizedBeforeSlideshow;
     private DispatcherTimer? _slideshowCountdownTimer;
     private bool _slideshowIsAdvancing;
+
+    // marked photo for comparison
+    private int _markedImageIndex = -1;
+    private int _returnImageIndex = -1;
 
 
     private static ViewerControl Viewer => App.MainWindow.PART_MainView.PART_Viewer;
@@ -1142,6 +1147,94 @@ public partial class AppAPIProvider
 
     #endregion // Navigation APIs
 
+
+    #region Mark Photo APIs
+
+    /// <summary>
+    /// Marks the current image for A/B comparison and pre-loads it.
+    /// </summary>
+    public void IG_MarkPhoto()
+    {
+        var photo = Core.Photos.Current;
+        if (photo is null) return;
+
+        _markedImageIndex = Core.Photos.CurrentIndex;
+        _returnImageIndex = -1;
+
+        // pre-load the photo so toggle uses the fast path (no preview)
+        _ = photo.LoadAsync(useCache: false);
+
+        _ = Message.ShowAsync(Core.Lang[LangId.Menu_MnuMarkPhoto]);
+    }
+
+
+    /// <summary>
+    /// Toggles between the marked image and the return position for A/B comparison.
+    /// Bypasses ViewPhotoAsync's Dispatcher.Post for minimal latency.
+    /// </summary>
+    public async void IG_ToggleMarkedPhoto()
+    {
+        if (_markedImageIndex < 0)
+        {
+            IG_MarkPhoto();
+            return;
+        }
+
+        var currentIndex = Core.Photos.CurrentIndex;
+
+        // on the marked image → jump back to return position
+        if (currentIndex == _markedImageIndex && _returnImageIndex >= 0)
+        {
+            await SwitchToPhotoAsync(_returnImageIndex);
+            return;
+        }
+
+        // not on the marked image → save current and jump to mark
+        if (currentIndex != _markedImageIndex)
+        {
+            _returnImageIndex = currentIndex;
+            await SwitchToPhotoAsync(_markedImageIndex);
+        }
+    }
+
+
+    /// <summary>
+    /// Switches the viewer to a photo at the given index using the fast path (no preview).
+    /// </summary>
+    private static async Task SwitchToPhotoAsync(int index)
+    {
+        var photo = Core.Photos.Select(index);
+        if (photo is null) return;
+
+        // pre-load if needed, so SetPhotoAsync hits the fast path
+        if (photo.State != PhotoState.Loaded)
+        {
+            await photo.LoadAsync(useCache: false);
+        }
+
+        photo.ReadOptions = new()
+        {
+            FrameIndex = 0,
+            OnlyLoadRawPreview = Core.Config.EnableOnlyLoadRawPreview,
+            OnlyLoadNonRawPreview = Core.Config.EnableOnlyLoadNonRawPreview,
+            PreviewMinWidth = Core.Config.PreviewMinWidth,
+            PreviewMinHeight = Core.Config.PreviewMinHeight,
+        };
+
+        Viewer.EnableImagePreview = Core.Config.EnableImagePreview;
+
+        await Viewer.SetPhotoAsync(photo, new PhotoLoadingOptions
+        {
+            UseCache = true,
+            ResetZoom = false,
+            Channels = Core.ColorChannels,
+        });
+
+        Gallery.ScrollToItem(index);
+        Core.Photos.RequestCacheAround(index);
+    }
+
+    #endregion // Mark Photo APIs
 
 
     #region Zoom APIs
