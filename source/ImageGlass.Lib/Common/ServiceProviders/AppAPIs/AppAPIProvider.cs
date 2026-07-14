@@ -942,7 +942,7 @@ public partial class AppAPIProvider
         }
 
 
-        _ = App.MainWindow.PART_MainView.ViewPhotoAsync(photo);
+        _ = App.MainWindow.PART_MainView.ViewPhotoAsync(photo, enablePreview: false);
 
         // reset slideshow interval on manual navigation
         if (Core.Config.EnableSlideshow && !_slideshowIsAdvancing)

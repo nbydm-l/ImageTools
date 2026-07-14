@@ -877,7 +877,7 @@ public partial class MainWindowView : PhControl
     }
 
 
-    public async Task ViewPhotoAsync(Photo? photo, bool useCache = true, bool scrollToThumbnail = true, bool resetZoom = true)
+    public async Task ViewPhotoAsync(Photo? photo, bool useCache = true, bool scrollToThumbnail = true, bool resetZoom = true, bool enablePreview = true)
     {
         // clear the current in-app message
         _ = PART_Message.ClearAsync();
@@ -901,7 +901,7 @@ public partial class MainWindowView : PhControl
         Dispatcher.UIThread.Post(async () =>
         {
             // apply user settings to the viewer
-            PART_Viewer.EnableImagePreview = Core.Config.EnableImagePreview;
+            PART_Viewer.EnableImagePreview = enablePreview && Core.Config.EnableImagePreview;
 
             if (scrollToThumbnail)
             {
