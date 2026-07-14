@@ -68,6 +68,11 @@ public partial class ViewerControl : PhControl
     /// </summary>
     public Photo? Photo { get; private set; }
 
+    /// <summary>
+    /// Holds the previously viewed photo to enable instant switching back.
+    /// </summary>
+    private Photo? _lastPhoto;
+
 
     /// <summary>
     /// Gets the bitmap size.
@@ -130,6 +135,8 @@ public partial class ViewerControl : PhControl
 
         DisposeCheckerboard();
         DisposeNativePhotoResources();
+        _lastPhoto?.Unload();
+        _lastPhoto = null;
     }
 
 
@@ -579,7 +586,14 @@ public partial class ViewerControl : PhControl
             StopAnimator();
             SourceKind = PhotoSource.None;
             Photo?.CancelLoading();
-            Photo?.Unload();
+
+            // keep the previous photo's pixel data alive so switching back is instant;
+            // only unload the older _lastPhoto when a third photo is viewed
+            if (_lastPhoto is not null && _lastPhoto != Photo)
+            {
+                _lastPhoto.Unload();
+            }
+            _lastPhoto = Photo;
 
             // reset
             AnimationSource = AnimationSources.None;
