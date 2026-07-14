@@ -324,6 +324,12 @@ public partial class App : Application
         Core.Config = Config.Load(Config.CONFIG_USER, Core.Args);
         StartupTrace.Mark("InitInstance:configLoaded");
 
+        // always start with all color channels on
+        Core.Config.ColorChannelR = true;
+        Core.Config.ColorChannelG = true;
+        Core.Config.ColorChannelB = true;
+        Core.Config.ColorChannelA = true;
+
         // Initialize lock manager with loaded config
         ServiceProviders.FeatureManager.Refresh();
 

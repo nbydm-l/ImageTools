@@ -1729,10 +1729,6 @@ public partial class AppAPIProvider
 
         var newChannels = Core.ColorChannels ^ channel;
 
-        // ensure at least one RGB channel is always active
-        if ((newChannels & ColorChannels.RGB) == 0)
-            newChannels |= channel;
-
         if (Viewer.FilterColorChannels(newChannels, false))
         {
             Core.ColorChannels = newChannels;
