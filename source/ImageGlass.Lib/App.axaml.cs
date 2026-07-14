@@ -330,6 +330,9 @@ public partial class App : Application
         Core.Config.ColorChannelB = true;
         Core.Config.ColorChannelA = true;
 
+        // always enable free panning
+        Core.Config.EnableFreePan = true;
+
         // Initialize lock manager with loaded config
         ServiceProviders.FeatureManager.Refresh();
 

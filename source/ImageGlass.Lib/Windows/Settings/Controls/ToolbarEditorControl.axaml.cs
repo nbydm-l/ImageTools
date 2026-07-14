@@ -251,6 +251,7 @@ public partial class ToolbarEditorControl : PhControl
         ConfigBindingValue = m.ConfigBindingValue,
         Alignment = m.Alignment,
         OnClick = m.OnClick,
+        OnRightClick = m.OnRightClick,
     };
 
 
@@ -472,6 +473,9 @@ public partial class ToolbarEditorControl : PhControl
         model.ConfigBinding = edited.ConfigBinding;
         model.ConfigBindingValue = edited.ConfigBindingValue;
         model.OnClick = edited.OnClick;
+        // Edit dialog does not expose right-click; keep the existing action.
+        if (edited.OnRightClick is not null)
+            model.OnRightClick = edited.OnRightClick;
 
         var group = GroupOf(model);
         if (group == EditorGroup.Primary && edited.Alignment == ToolbarItemAlignment.Right)

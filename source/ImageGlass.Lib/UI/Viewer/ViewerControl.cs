@@ -529,6 +529,12 @@ public partial class ViewerControl : PhControl
             {
                 SetZoomMode(null, isManualZoom, zoomedByResizing);
             }
+            else
+            {
+                // Keep zoom + center-offset pan, but rebuild DestRect/SrcRect
+                // for the possibly-new BitmapSize (e.g. lock-zoom navigation).
+                CalculateDrawingRegion();
+            }
 
             InvalidateVisual();
         });
@@ -968,9 +974,12 @@ public partial class ViewerControl : PhControl
                         newSrcRect = newSrcRect.WithWidth(newSrcRect.Width / diffRatio.Width);
                         newSrcRect = newSrcRect.WithHeight(newSrcRect.Height / diffRatio.Height);
 
-                        // update zoom source
+                        // update zoom source; convert SrcRect to center-offset pan
+                        // so switching image sizes later keeps the visual center
                         SrcRect = newSrcRect.Normalize();
-                        _logicalSrcPoint = SrcRect.Position;
+                        _logicalSrcPoint = new(
+                            BitmapSize.Width / 2.0 - (SrcRect.X + SrcRect.Width / 2.0),
+                            BitmapSize.Height / 2.0 - (SrcRect.Y + SrcRect.Height / 2.0));
                         _zooming.Factor *= diffRatio.Width;
                         _zooming.ZoomedPoint = new();
 

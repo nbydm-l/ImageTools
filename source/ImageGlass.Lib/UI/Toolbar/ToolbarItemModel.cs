@@ -419,6 +419,30 @@ public partial class ToolbarItemModel : PhReactive, IJsonOnDeserialized
     {
         // save action display text
         OnClick?.LangKey = Text;
+        OnRightClick?.LangKey = Text;
+
+        EnsureBuiltinRightClick();
+    }
+
+
+    /// <summary>
+    /// Fills <see cref="OnRightClick"/> from the matching built-in button when missing
+    /// (older configs / toolbar-editor clones dropped this field).
+    /// </summary>
+    public void EnsureBuiltinRightClick()
+    {
+        if (OnRightClick is not null || IsSeparator || string.IsNullOrEmpty(Id))
+            return;
+
+        foreach (var builtin in Config.BuiltInToolbarItems)
+        {
+            if (builtin.Id == Id && builtin.OnRightClick is not null)
+            {
+                OnRightClick = builtin.OnRightClick;
+                OnRightClick.LangKey = Text;
+                break;
+            }
+        }
     }
 
 }

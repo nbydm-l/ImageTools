@@ -230,7 +230,7 @@ public partial class Config : PhReactive
     /// </summary>
     public bool EnableFreePan
     {
-        get => Get(ConfigId.EnableFreePan, false);
+        get => Get(ConfigId.EnableFreePan, true);
         set => Set(ConfigId.EnableFreePan, value);
     }
 

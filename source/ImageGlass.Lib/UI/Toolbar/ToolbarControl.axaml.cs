@@ -367,6 +367,7 @@ public partial class ToolbarControl : PhControl
         {
             srcIndex++;
             vm.SourceIndex = srcIndex;
+            vm.EnsureBuiltinRightClick();
 
 
             // create toolbar item element
