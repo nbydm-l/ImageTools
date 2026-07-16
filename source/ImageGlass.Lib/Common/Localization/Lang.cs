@@ -1125,6 +1125,7 @@ public class Lang
         new(LangId.Tool_ColorPicker_ChkShowHsvA, "Use HSV format with alpha value"), //v8.0
         new(LangId.Tool_ColorPicker_ChkShowCmykA, "Use CMYK format with alpha value"), //v10.0
         new(LangId.Tool_ColorPicker_ChkShowCIELabA, "Use CIELAB format with alpha value"), //v9.0
+        new(LangId.Tool_ColorPicker_ChkShowRgbaNormalized, "Show RGBA as 0–1 values (3 decimals)"), //v10.0
 
         #endregion // Tool: Color picker
 

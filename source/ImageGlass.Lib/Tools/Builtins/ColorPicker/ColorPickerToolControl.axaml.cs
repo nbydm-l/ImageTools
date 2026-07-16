@@ -134,6 +134,22 @@ public partial class ColorPickerToolControl : PhControl, IToolControl
 
 
     /// <summary>
+    /// Gets the selected color as normalized RGBA (0–1, 3 decimals).
+    /// </summary>
+    public string? ColorRGBA01 => SelectedColor.ToRgba01String();
+    public static readonly DirectProperty<ColorPickerToolControl, string?> ColorRGBA01Property =
+        AvaloniaProperty.RegisterDirect<ColorPickerToolControl, string?>(nameof(ColorRGBA01), i => i.ColorRGBA01);
+
+
+    /// <summary>
+    /// Gets whether the normalized RGBA row is visible.
+    /// </summary>
+    public bool IsRgbaNormalizedVisible => Options.ShowRgbaNormalized;
+    public static readonly DirectProperty<ColorPickerToolControl, bool> IsRgbaNormalizedVisibleProperty =
+        AvaloniaProperty.RegisterDirect<ColorPickerToolControl, bool>(nameof(IsRgbaNormalizedVisible), i => i.IsRgbaNormalizedVisible);
+
+
+    /// <summary>
     /// Gets the selected color in HEX format.
     /// </summary>
     public string? ColorHEX => FormatColor(ColorFormat.HEX, Options.ShowHexWithAlpha);
@@ -307,6 +323,8 @@ public partial class ColorPickerToolControl : PhControl, IToolControl
     private void RaiseColorFormatPropertiesChanged()
     {
         RaisePropertyChanged(ColorRGBProperty, default, ColorRGB);
+        RaisePropertyChanged(ColorRGBA01Property, default, ColorRGBA01);
+        RaisePropertyChanged(IsRgbaNormalizedVisibleProperty, default, IsRgbaNormalizedVisible);
         RaisePropertyChanged(ColorHEXProperty, default, ColorHEX);
         RaisePropertyChanged(ColorHSLProperty, default, ColorHSL);
         RaisePropertyChanged(ColorHSVProperty, default, ColorHSV);

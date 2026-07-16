@@ -39,6 +39,16 @@ public partial class AppAPIProvider
     private Hotkey? _lastHotkeyPressed = null;
     private InterlockedBool _isQuickBrowsingPhotos = new(false);
 
+    // Alt-hold / double-tap Alt color picker gestures
+    private const int ColorPickerDoubleAltMs = 350;
+    private static bool _colorPickerPinned;
+    private static bool _colorPickerAltHoldSession;
+    private static bool _colorPickerWasOpenBeforeAltHold;
+    private static bool _ignoreAltHoldUntilKeyUp;
+    private static long _lastAltKeyUpTicks;
+
+
+
     /// <summary>
     /// Gets a value indicating whether the user is holding a navigation key
     /// for rapid browsing (quick browse mode).
@@ -97,11 +107,11 @@ public partial class AppAPIProvider
         new(LangId.Menu_MnuScaleToFill,      API.IG_SetZoomMode, nameof(ZoomMode.ScaleToFill),   [new(Key.D6), new(Key.NumPad6)]),
 
 
-        // Panning
-        new(LangId.Menu_MnuPanLeft,          API.IG_PanLeft,             [new(MKeys.Alt, Key.Left)]),
-        new(LangId.Menu_MnuPanRight,         API.IG_PanRight,            [new(MKeys.Alt, Key.Right)]),
-        new(LangId.Menu_MnuPanUp,            API.IG_PanUp,               [new(MKeys.Alt, Key.Up)]),
-        new(LangId.Menu_MnuPanDown,          API.IG_PanDown,             [new(MKeys.Alt, Key.Down)]),
+        // Panning (Alt+arrows reserved for color-picker Alt-hold / double-Alt gestures)
+        new(LangId.Menu_MnuPanLeft,          API.IG_PanLeft),
+        new(LangId.Menu_MnuPanRight,         API.IG_PanRight),
+        new(LangId.Menu_MnuPanUp,            API.IG_PanUp),
+        new(LangId.Menu_MnuPanDown,          API.IG_PanDown),
         new(LangId.Menu_MnuPanToLeftSide,    API.IG_PanToLeft,           [new(Hotkey.Ctrl | MKeys.Alt, Key.Left)]),
         new(LangId.Menu_MnuPanToRightSide,   API.IG_PanToRight,          [new(Hotkey.Ctrl | MKeys.Alt, Key.Right)]),
         new(LangId.Menu_MnuPanToTop,         API.IG_PanToTop,            [new(Hotkey.Ctrl | MKeys.Alt, Key.Up)]),
@@ -161,8 +171,8 @@ public partial class AppAPIProvider
         new(LangId.Menu_MnuChangeBackgroundColor,    API.IG_SetBackgroundColor,      Key.M),
 
 
-        // Plugins
-        new(LangId.Menu_MnuColorPicker,          API.IG_ToggleTool, ColorPickerToolControl.TOOL_ID,    [new(MKeys.Alt, Key.K)]),
+        // Plugins (Color picker: hold Alt + mouse to sample; double-tap Alt to pin/unpin panel)
+        new(LangId.Menu_MnuColorPicker,          API.IG_ToggleTool, ColorPickerToolControl.TOOL_ID),
         new(LangId.Menu_MnuCropTool,             API.IG_ToggleTool, CropImageToolControl.TOOL_ID,      [new(MKeys.Alt, Key.C)]),
         new(LangId.Menu_MnuFrameNav,             API.IG_ToggleTool, FrameNavToolControl.TOOL_ID,       [new(MKeys.Alt, Key.P)]),
         new(LangId.Menu_MnuResizeTool,           API.IG_OpenTool, ImageResizerTool.TOOL_ID,            [new(MKeys.Alt, Key.R)]),
@@ -321,6 +331,10 @@ public partial class AppAPIProvider
     /// </summary>
     public async Task HandleKeyDownAsync(KeyEventArgs e)
     {
+        // Alt-hold / double-tap Alt for the color picker (before other hotkeys)
+        if (TryHandleColorPickerAltKeyDown(e))
+            return;
+
         // 1. get hotkey action
         var hotkey = new Hotkey(e);
         var action = AppHotkeysMap.GetValueOrDefault(hotkey.KeyString);
@@ -406,6 +420,10 @@ public partial class AppAPIProvider
     /// </summary>
     public async Task HandleKeyUpAsync(KeyEventArgs e)
     {
+        // Alt release ends temporary color-picker hold (unless pinned / double-tap)
+        if (TryHandleColorPickerAltKeyUp(e))
+            return;
+
         // 1. clear early to prevent a subsequent key press from being
         // falsely detected as quick browsing while we await below
         _lastHotkeyPressed = null;
@@ -486,6 +504,134 @@ public partial class AppAPIProvider
 
         var hotkeyText = String.Join(", ", action.Hotkeys);
         return hotkeyText;
+    }
+
+
+    // ── Alt color-picker gestures ───────────────────────────────────────────
+
+    private static bool IsAltKey(Key key)
+        => key is Key.LeftAlt or Key.RightAlt;
+
+
+    private bool IsColorPickerOpen()
+        => string.Equals(ToolHost.Tool?.ToolId, ColorPickerToolControl.TOOL_ID, StringComparison.Ordinal);
+
+
+    /// <summary>
+    /// Hold Alt: open color picker for mouse sampling.
+    /// Double-tap Alt: pin/unpin the panel (stay open without holding Alt).
+    /// Alt+other key: cancel a temporary hold so other Alt chords still work.
+    /// </summary>
+    private bool TryHandleColorPickerAltKeyDown(KeyEventArgs e)
+    {
+        // Alt chord (e.g. Alt+C): cancel temporary hold, let normal hotkeys run
+        if (!IsAltKey(e.Key) && e.KeyModifiers.HasFlag(KeyModifiers.Alt))
+        {
+            CancelAltHoldColorPicker();
+            return false;
+        }
+
+        if (!IsAltKey(e.Key)) return false;
+
+        // Ignore auto-repeat while holding Alt
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Control) || e.KeyModifiers.HasFlag(KeyModifiers.Shift))
+            return false;
+
+        var now = Environment.TickCount64;
+        var isDoubleTap = _lastAltKeyUpTicks > 0
+            && (now - _lastAltKeyUpTicks) <= ColorPickerDoubleAltMs;
+
+        if (isDoubleTap)
+        {
+            ToggleColorPickerPinned();
+            _ignoreAltHoldUntilKeyUp = true;
+            _lastAltKeyUpTicks = 0;
+            e.Handled = true;
+            return true;
+        }
+
+        // Start hold session: open picker if needed so mouse can sample
+        _colorPickerWasOpenBeforeAltHold = IsColorPickerOpen();
+        if (!_colorPickerWasOpenBeforeAltHold)
+            IG_OpenTool(ColorPickerToolControl.TOOL_ID);
+
+        _colorPickerAltHoldSession = true;
+        _ignoreAltHoldUntilKeyUp = false;
+        e.Handled = true;
+        return true;
+    }
+
+
+    private bool TryHandleColorPickerAltKeyUp(KeyEventArgs e)
+    {
+        if (!IsAltKey(e.Key)) return false;
+
+        _lastAltKeyUpTicks = Environment.TickCount64;
+
+        if (_ignoreAltHoldUntilKeyUp)
+        {
+            _ignoreAltHoldUntilKeyUp = false;
+            _colorPickerAltHoldSession = false;
+            e.Handled = true;
+            return true;
+        }
+
+        if (_colorPickerAltHoldSession)
+        {
+            // Temporary hold only: close if we opened it and it's not pinned
+            if (!_colorPickerPinned && !_colorPickerWasOpenBeforeAltHold && IsColorPickerOpen())
+                IG_CloseTool(ColorPickerToolControl.TOOL_ID);
+
+            _colorPickerAltHoldSession = false;
+            e.Handled = true;
+            return true;
+        }
+
+        return false;
+    }
+
+
+    private void CancelAltHoldColorPicker()
+    {
+        if (!_colorPickerAltHoldSession) return;
+
+        if (!_colorPickerPinned && !_colorPickerWasOpenBeforeAltHold && IsColorPickerOpen())
+            IG_CloseTool(ColorPickerToolControl.TOOL_ID);
+
+        _colorPickerAltHoldSession = false;
+        _ignoreAltHoldUntilKeyUp = false;
+    }
+
+
+    private void ToggleColorPickerPinned()
+    {
+        _colorPickerPinned = !_colorPickerPinned;
+
+        if (_colorPickerPinned)
+        {
+            if (!IsColorPickerOpen())
+                IG_OpenTool(ColorPickerToolControl.TOOL_ID);
+        }
+        else if (IsColorPickerOpen())
+        {
+            IG_CloseTool(ColorPickerToolControl.TOOL_ID);
+        }
+
+        // This session came from the double-tap itself — don't auto-close on KeyUp
+        _colorPickerAltHoldSession = false;
+        _colorPickerWasOpenBeforeAltHold = _colorPickerPinned;
+    }
+
+
+    /// <summary>
+    /// Clears pin/hold state when the color picker is closed outside Alt gestures.
+    /// </summary>
+    private static void ClearColorPickerAltPinState()
+    {
+        _colorPickerPinned = false;
+        _colorPickerAltHoldSession = false;
+        _colorPickerWasOpenBeforeAltHold = false;
+        _ignoreAltHoldUntilKeyUp = false;
     }
 
 

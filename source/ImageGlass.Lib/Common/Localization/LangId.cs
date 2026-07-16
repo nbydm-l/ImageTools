@@ -766,6 +766,7 @@ public enum LangId
     Tool_ColorPicker_ChkShowHsvA,
     Tool_ColorPicker_ChkShowCmykA,
     Tool_ColorPicker_ChkShowCIELabA,
+    Tool_ColorPicker_ChkShowRgbaNormalized,
     #endregion // Tool: Color picker
 
 

@@ -32,6 +32,7 @@ internal class ColorPickerSettingsWindow : DialogWindow
     private CheckBox _chkShowHsvA = null!;
     private CheckBox _chkShowCmykA = null!;
     private CheckBox _chkShowCIELabA = null!;
+    private CheckBox _chkShowRgbaNormalized = null!;
 
 
     /// <summary>
@@ -71,6 +72,7 @@ internal class ColorPickerSettingsWindow : DialogWindow
         _chkShowHsvA.Content = Core.Lang[LangId.Tool_ColorPicker_ChkShowHsvA];
         _chkShowCmykA.Content = Core.Lang[LangId.Tool_ColorPicker_ChkShowCmykA];
         _chkShowCIELabA.Content = Core.Lang[LangId.Tool_ColorPicker_ChkShowCIELabA];
+        _chkShowRgbaNormalized.Content = Core.Lang[LangId.Tool_ColorPicker_ChkShowRgbaNormalized];
     }
 
 
@@ -84,6 +86,7 @@ internal class ColorPickerSettingsWindow : DialogWindow
             ShowHsvWithAlpha = _chkShowHsvA.IsChecked == true,
             ShowCmykWithAlpha = _chkShowCmykA.IsChecked == true,
             ShowCIELabWithAlpha = _chkShowCIELabA.IsChecked == true,
+            ShowRgbaNormalized = _chkShowRgbaNormalized.IsChecked == true,
         };
 
         base.OnDialogSubmitted(e);
@@ -106,6 +109,7 @@ internal class ColorPickerSettingsWindow : DialogWindow
         _chkShowHsvA.IsChecked = config.ShowHsvWithAlpha;
         _chkShowCmykA.IsChecked = config.ShowCmykWithAlpha;
         _chkShowCIELabA.IsChecked = config.ShowCIELabWithAlpha;
+        _chkShowRgbaNormalized.IsChecked = config.ShowRgbaNormalized;
     }
 
 
@@ -120,6 +124,7 @@ internal class ColorPickerSettingsWindow : DialogWindow
         _chkShowHsvA = new CheckBox();
         _chkShowCmykA = new CheckBox();
         _chkShowCIELabA = new CheckBox();
+        _chkShowRgbaNormalized = new CheckBox();
 
         var root = new StackPanel
         {
@@ -129,6 +134,7 @@ internal class ColorPickerSettingsWindow : DialogWindow
         };
 
         root.Children.AddRange([
+            _chkShowRgbaNormalized,
             _chkShowRgbA,
             _chkShowHexA,
             _chkShowHslA,

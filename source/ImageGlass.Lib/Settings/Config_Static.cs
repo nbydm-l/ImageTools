@@ -214,6 +214,15 @@ public partial class Config
             ConfigBindingValue = ColorPickerToolControl.TOOL_ID,
             OnClick = new(LangId.Menu_MnuColorPicker, API.IG_ToggleTool, ColorPickerToolControl.TOOL_ID),
         },
+        // scale to fit — always fit image to the viewer; re-fits on photo change
+        new() {
+            Id = $"Btn_{nameof(IgThemeIcon.ScaleToFit)}",
+            Image = nameof(IgThemeIcon.ScaleToFit),
+            Text = Lang.KeysMap[LangId.Menu_MnuScaleToFit],
+            ConfigBinding = nameof(Config.ZoomMode),
+            ConfigBindingValue = ZoomMode.ScaleToFit.ToString(),
+            OnClick = new(LangId.Menu_MnuScaleToFit, API.IG_SetZoomMode, nameof(ZoomMode.ScaleToFit)),
+        },
         ToolbarItemModel.Separator,
 
 

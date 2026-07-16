@@ -227,10 +227,11 @@ public partial class ViewerControl : PhControl
         var p = e.GetCurrentPoint(this);
         var requestRerender = false;
 
-        // set the init point for panning
+        // set the init point for panning (right-click must not drag-pan)
         if (p.Pointer.Type == PointerType.Mouse)
         {
-            var canPanByMouse = !EnableSelection || e.Properties.IsMiddleButtonPressed;
+            var canPanByMouse = !e.Properties.IsRightButtonPressed
+                && (!EnableSelection || e.Properties.IsMiddleButtonPressed);
 
             if (canPanByMouse)
             {

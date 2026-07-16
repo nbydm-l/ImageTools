@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia.Media;
 using System;
+using System.Globalization;
 
 namespace ImageGlass.Common.Extensions;
 
@@ -224,6 +225,17 @@ public static class Color_Exts
         if (!skipAlpha) str += $", {alpha}";
 
         return str;
+    }
+
+
+    /// <summary>
+    /// Converts this color to normalized RGBA values in the 0–1 range (3 decimal places).
+    /// </summary>
+    public static string ToRgba01String(this Color c)
+    {
+        static string F(byte v) => (v / 255.0).ToString("0.000", CultureInfo.InvariantCulture);
+
+        return $"{F(c.R)}, {F(c.G)}, {F(c.B)}, {F(c.A)}";
     }
 
 

@@ -942,7 +942,10 @@ public partial class AppAPIProvider
         }
 
 
-        _ = App.MainWindow.PART_MainView.ViewPhotoAsync(photo, resetZoom: false, enablePreview: false);
+        // Keep zoom/pan across photos by default (comparison workflow).
+        // ScaleToFit must re-apply per image so each photo fills the viewport.
+        var resetZoom = Core.Config.ZoomMode == ZoomMode.ScaleToFit;
+        _ = App.MainWindow.PART_MainView.ViewPhotoAsync(photo, resetZoom: resetZoom, enablePreview: false);
 
         // reset slideshow interval on manual navigation
         if (Core.Config.EnableSlideshow && !_slideshowIsAdvancing)
@@ -1330,12 +1333,21 @@ public partial class AppAPIProvider
 
     /// <summary>
     /// Sets the zoom mode value.
+    /// Clicking the active non-AutoZoom mode again toggles back to AutoZoom.
     /// </summary>
     public static void IG_SetZoomMode(ZoomMode mode)
     {
         if (mode == Core.Config.ZoomMode)
         {
-            IG_Refresh();
+            // Toggle off: ScaleToFit / LockZoom / etc. → back to AutoZoom
+            if (mode != ZoomMode.AutoZoom)
+            {
+                Core.Config.ZoomMode = ZoomMode.AutoZoom;
+            }
+            else
+            {
+                IG_Refresh();
+            }
         }
         else
         {
@@ -3075,6 +3087,9 @@ public partial class AppAPIProvider
 
                 ToolHost.CloseCurrentTool();
                 Core.Config.LastOpenedTool = "";
+
+                if (string.Equals(toolId, ColorPickerToolControl.TOOL_ID, StringComparison.Ordinal))
+                    ClearColorPickerAltPinState();
             }
             else
             {
@@ -3168,6 +3183,10 @@ public partial class AppAPIProvider
 
         ToolHost.CloseTool(toolId);
         Core.Config.LastOpenedTool = "";
+
+        // Closing the panel (X / toggle) clears Alt-pin residency
+        if (string.Equals(toolId, ColorPickerToolControl.TOOL_ID, StringComparison.Ordinal))
+            ClearColorPickerAltPinState();
     }
 
 

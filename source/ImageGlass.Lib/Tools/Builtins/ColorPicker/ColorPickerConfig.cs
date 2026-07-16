@@ -115,4 +115,18 @@ public class ColorPickerConfig() : PhReactive
         }
     } = false;
 
+
+    /// <summary>
+    /// Gets, sets whether to show RGBA as normalized 0–1 values (3 decimal places).
+    /// </summary>
+    public bool ShowRgbaNormalized
+    {
+        get; set
+        {
+            if (field == value) return;
+            field = value;
+            _ = OnPropertyChanged();
+        }
+    } = true;
+
 }

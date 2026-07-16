@@ -123,6 +123,22 @@
                         ToolTip.Tip="{CompiledBinding #Root.CopyButtonTooltipText}" />
                 </StackPanel>
 
+                <!--  RGBA 0–1  -->
+                <StackPanel
+                    MinWidth="150"
+                    VerticalAlignment="Center"
+                    IsVisible="{CompiledBinding #Root.IsRgbaNormalizedVisible}"
+                    Orientation="Horizontal"
+                    Spacing="2">
+                    <TextBlock Opacity="0.6" Text="RGBA 0–1" />
+                    <ui:PhToolButton
+                        Padding="4,0"
+                        VerticalContentAlignment="Center"
+                        Click="ButtonCopy_Click"
+                        Content="{CompiledBinding #Root.ColorRGBA01}"
+                        ToolTip.Tip="{CompiledBinding #Root.CopyButtonTooltipText}" />
+                </StackPanel>
+
                 <!--  HEX  -->
                 <StackPanel
                     MinWidth="150"
