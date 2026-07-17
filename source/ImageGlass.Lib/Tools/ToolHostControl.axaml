@@ -28,58 +28,59 @@
 
 
     <ui:PhControl.Content>
-        <Grid ColumnDefinitions="*,Auto">
-            <!--  The slot for hosted tool content  -->
-            <ContentControl
-                Grid.Column="0"
-                BorderBrush="{DynamicResource IG_BorderNeutralBrush}"
-                BorderThickness="0,1"
-                Content="{CompiledBinding #Root.Tool}" />
+        <Border
+            Background="{DynamicResource IG_ThemeMenuBackgroundBrush}"
+            BorderBrush="{DynamicResource IG_BorderNeutralBrush}"
+            BorderThickness="0,1,0,0">
+            <Grid ColumnDefinitions="*,Auto">
+                <!--  The slot for hosted tool content  -->
+                <ContentControl Grid.Column="0" Content="{CompiledBinding #Root.Tool}" />
 
 
-            <!--  Close button  -->
-            <StackPanel
-                Margin="4"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Spacing="4"
-                ZIndex="100">
                 <!--  Close button  -->
-                <ui:PhToolButton
-                    x:Name="PART_BtnClose"
-                    Padding="6"
-                    Classes="plugin_button"
-                    Click="PART_BtnClose_Click"
-                    ToolTip.Tip="{CompiledBinding #Root.CloseButtonTooltipText}">
-                    <Path
-                        Width="12"
-                        Height="12"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Data="{StaticResource IconClose}"
-                        Fill="{DynamicResource IG_ThemeForegroundBrush}"
-                        Stretch="Uniform" />
-                </ui:PhToolButton>
+                <StackPanel
+                    Margin="4"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Spacing="4"
+                    ZIndex="100">
+                    <!--  Close button  -->
+                    <ui:PhToolButton
+                        x:Name="PART_BtnClose"
+                        Padding="6"
+                        Classes="plugin_button"
+                        Click="PART_BtnClose_Click"
+                        ToolTip.Tip="{CompiledBinding #Root.CloseButtonTooltipText}">
+                        <Path
+                            Width="12"
+                            Height="12"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Data="{StaticResource IconClose}"
+                            Fill="{DynamicResource IG_ThemeForegroundBrush}"
+                            Stretch="Uniform" />
+                    </ui:PhToolButton>
 
-                <!--  Settings button  -->
-                <ui:PhToolButton
-                    x:Name="PART_BtnSettings"
-                    Padding="6"
-                    Classes="plugin_button"
-                    Click="PART_BtnSettings_Click"
-                    IsVisible="{CompiledBinding #Root.HasSettings}"
-                    ToolTip.Tip="{CompiledBinding #Root.SettingsButtonTooltipText}">
-                    <Path
-                        Width="10"
-                        Height="10"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Data="{StaticResource IconSettings}"
-                        Stretch="Uniform"
-                        Stroke="{DynamicResource IG_ThemeForegroundBrush}"
-                        StrokeThickness="1" />
-                </ui:PhToolButton>
-            </StackPanel>
-        </Grid>
+                    <!--  Settings button  -->
+                    <ui:PhToolButton
+                        x:Name="PART_BtnSettings"
+                        Padding="6"
+                        Classes="plugin_button"
+                        Click="PART_BtnSettings_Click"
+                        IsVisible="{CompiledBinding #Root.HasSettings}"
+                        ToolTip.Tip="{CompiledBinding #Root.SettingsButtonTooltipText}">
+                        <Path
+                            Width="10"
+                            Height="10"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Data="{StaticResource IconSettings}"
+                            Stretch="Uniform"
+                            Stroke="{DynamicResource IG_ThemeForegroundBrush}"
+                            StrokeThickness="1" />
+                    </ui:PhToolButton>
+                </StackPanel>
+            </Grid>
+        </Border>
     </ui:PhControl.Content>
 </ui:PhControl>

@@ -32,11 +32,9 @@
         <Grid
             x:Name="PART_ViewerWrapper"
             Grid.Row="1"
-            RowDefinitions="*, Auto"
             Background="{DynamicResource IG_ViewerBackgroundBrush}">
             <viewer:ViewerControl
                 x:Name="PART_Viewer"
-                Grid.Row="0"
                 CheckerboardMode="{CompiledBinding CheckerboardMode, Source={x:Static cm:Core.Config}}"
                 EnableDebug="{CompiledBinding EnableDebug, Source={x:Static cm:Core.Config}}"
                 EnableFreePan="{CompiledBinding EnableFreePan, Source={x:Static cm:Core.Config}}"
@@ -56,7 +54,13 @@
                 </Panel>
             </viewer:ViewerControl>
 
-            <tool:ToolHostControl x:Name="PART_ToolHost" Grid.Row="1" />
+            <!--  Overlay at bottom so opening tools (e.g. Alt-hold color picker) does not resize the viewer  -->
+            <tool:ToolHostControl
+                x:Name="PART_ToolHost"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom"
+                IsHitTestVisible="False"
+                ZIndex="10" />
         </Grid>
 
 

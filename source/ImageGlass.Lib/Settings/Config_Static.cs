@@ -116,7 +116,7 @@ public partial class Config
         [MouseWheelEvent.Scroll] = MouseWheelAction.Zoom,
         [MouseWheelEvent.CtrlAndScroll] = MouseWheelAction.PanVertically,
         [MouseWheelEvent.ShiftAndScroll] = MouseWheelAction.PanHorizontally,
-        [MouseWheelEvent.AltAndScroll] = MouseWheelAction.BrowseImages,
+        [MouseWheelEvent.AltAndScroll] = MouseWheelAction.DoNothing,
     };
 
 

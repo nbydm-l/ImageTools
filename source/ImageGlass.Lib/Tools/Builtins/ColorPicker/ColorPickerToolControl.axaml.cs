@@ -266,6 +266,13 @@ public partial class ColorPickerToolControl : PhControl, IToolControl
 
         CurrentPoint = e.SourcePoint.ToPoint(1);
         CurrentColor = sender.GetColorAt(e.SourcePoint.X, e.SourcePoint.Y);
+
+        // Right-button hold + drag: continuously update the committed pick
+        if (e.Point.Properties.IsRightButtonPressed)
+        {
+            SelectedPoint = CurrentPoint;
+            SelectedColor = CurrentColor;
+        }
     }
 
 

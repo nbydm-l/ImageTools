@@ -69,6 +69,10 @@ public partial class MainWindow : PhWindow
 
         // events
         Core.AppInstance.InstanceInvoked += AppInstance_InstanceInvoked;
+
+        // Catch Alt KeyUp even if a child control or access-key handler marked it handled
+        // (otherwise Alt-hold color picker stays open after release).
+        AddHandler(KeyUpEvent, OnKeyUpTunnel, RoutingStrategies.Tunnel, handledEventsToo: true);
     }
 
 
@@ -179,12 +183,24 @@ public partial class MainWindow : PhWindow
             or MaskedTextBox
             or AutoCompleteBox) return;
 
-        // process app hotkeys
-        // press ESC: exit slideshow if it is running
+        // Esc: exit slideshow, then fullscreen; never exit the app from the main window
         var hk = new Hotkey(e);
-        if (hk.IsSame(Key.Escape) && Core.Slideshow?.IsRunning == true)
+        if (hk.IsSame(Key.Escape))
         {
-            _ = await Core.API.RunApiAsync(API.IG_ToggleSlideshow, "false");
+            if (Core.Slideshow?.IsRunning == true)
+            {
+                _ = await Core.API.RunApiAsync(API.IG_ToggleSlideshow, "false");
+                e.Handled = true;
+                return;
+            }
+
+            if (Core.Config.EnableFullScreen || WindowState == WindowState.FullScreen)
+            {
+                _ = await Core.API.RunApiAsync(API.IG_ToggleFullScreen, "false");
+                e.Handled = true;
+                return;
+            }
+
             e.Handled = true;
             return;
         }
@@ -195,14 +211,16 @@ public partial class MainWindow : PhWindow
     }
 
 
-    protected override async void OnKeyUp(KeyEventArgs e)
+    protected override void OnKeyUp(KeyEventArgs e)
     {
         base.OnKeyUp(e);
-        if (e.Handled) return;
+    }
 
-        // process app hotkeys
+
+    private async void OnKeyUpTunnel(object? sender, KeyEventArgs e)
+    {
+        // Tunnel + handledEventsToo: Alt-hold color picker closes reliably on release
         await Core.API.HandleKeyUpAsync(e);
-        if (e.Handled) return;
     }
 
 

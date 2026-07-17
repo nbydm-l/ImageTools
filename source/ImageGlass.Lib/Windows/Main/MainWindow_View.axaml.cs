@@ -28,6 +28,7 @@ using ImageGlass.Common.Photoing;
 using ImageGlass.Common.ServiceProviders;
 using ImageGlass.Common.ServiceProviders.FileSearchService;
 using ImageGlass.Common.Types;
+using ImageGlass.Tools;
 using ImageGlass.UI;
 using ImageGlass.UI.Viewer;
 using ImageGlass.UI.Viewer.ZoomAndPan;
@@ -413,6 +414,10 @@ public partial class MainWindowView : PhControl
 
     private async void PART_Viewer_ViewerPointerClicked(ViewerControl sender, ViewerPointerClickEventArgs e)
     {
+        // Right-click picks color while the color picker is open; skip context menu
+        if (e.ClickEvent == MouseClickEvent.RightClick && IsColorPickerOpen())
+            return;
+
         // get pointer click action from user settings
         var action = Core.Config.MouseClickActions.GetValueOrDefault(e.ClickEvent);
 
@@ -428,11 +433,16 @@ public partial class MainWindowView : PhControl
 
     private async void PART_Viewer_ViewerMouseWheel(ViewerControl sender, ViewerMouseWheelEventArgs e)
     {
+        // Alt+scroll while color picking: zoom like normal scroll (not browse / do-nothing)
+        var wheelEvent = e.WheelEvent;
+        if (wheelEvent == MouseWheelEvent.AltAndScroll && IsColorPickerOpen())
+            wheelEvent = MouseWheelEvent.Scroll;
+
         // get mouse wheel action from user settings
-        if (!Core.Config.MouseWheelActions.TryGetValue(e.WheelEvent, out var wheelAction))
+        if (!Core.Config.MouseWheelActions.TryGetValue(wheelEvent, out var wheelAction))
         {
             // fallback to the default action
-            _ = Config.DefaultMouseWheelActions.TryGetValue(e.WheelEvent, out wheelAction);
+            _ = Config.DefaultMouseWheelActions.TryGetValue(wheelEvent, out wheelAction);
         }
 
         switch (wheelAction)
@@ -459,6 +469,10 @@ public partial class MainWindowView : PhControl
                 break;
         }
     }
+
+
+    private bool IsColorPickerOpen()
+        => string.Equals(PART_ToolHost.Tool?.ToolId, ColorPickerToolControl.TOOL_ID, StringComparison.Ordinal);
 
 
     private void PART_GalleryResizer_DragCompleted(object? sender, VectorEventArgs e)

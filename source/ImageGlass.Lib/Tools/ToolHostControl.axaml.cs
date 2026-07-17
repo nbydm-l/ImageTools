@@ -90,6 +90,7 @@ public partial class ToolHostControl : PhControl
     {
         InitializeComponent();
         IsContentVisible = false;
+        IsHitTestVisible = false;
     }
 
 
@@ -149,6 +150,7 @@ public partial class ToolHostControl : PhControl
         // open the tool
         Tool = newTool;
         IsContentVisible = true;
+        IsHitTestVisible = true;
 
         return true;
     }
@@ -179,6 +181,7 @@ public partial class ToolHostControl : PhControl
         {
             Tool = null;
             IsContentVisible = false;
+            IsHitTestVisible = false;
         }
         catch { }
     }
