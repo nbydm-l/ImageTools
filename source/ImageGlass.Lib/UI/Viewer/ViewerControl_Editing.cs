@@ -315,14 +315,25 @@ public partial class ViewerControl
             _mipmapCache = null;
             _loadingOptions.Channels = colors;
 
-
-            // 3. skip filtering when all channels (RGBA) are selected
-            if (!colors.HasFlag(ColorChannels.RGBA))
+            SKImage? straightSrc = null;
+            try
             {
-                var filteredImage = SkiaCodec.FilterImageColorChannels(srcImage, colors);
-                if (filteredImage.IsDisposed()) return false;
+                straightSrc = SkiaCodec.ToStraightUnpremulImage(srcImage);
+                var filterSource = straightSrc ?? srcImage;
 
-                SKImageRef.Set(ref _imgRender, filteredImage);
+                // 3. skip filtering when all channels (RGBA) are selected
+                if (!colors.HasFlag(ColorChannels.RGBA))
+                {
+                    var filteredImage = SkiaCodec.FilterImageColorChannels(filterSource, colors);
+                    if (filteredImage.IsDisposed()) return false;
+
+                    SKImageRef.Set(ref _imgRender, filteredImage);
+                }
+            }
+            finally
+            {
+                if (straightSrc is not null && !ReferenceEquals(straightSrc, srcImage))
+                    straightSrc.Dispose();
             }
         }
 

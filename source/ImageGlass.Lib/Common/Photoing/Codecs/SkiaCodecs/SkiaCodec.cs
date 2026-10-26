@@ -213,11 +213,15 @@ public static partial class SkiaCodec
 
 
         // 2. read single-frame formats
-        using var bmpFrame = new SKBitmap(codec.Info);
+        var decodeInfo = new SKImageInfo(
+            codec.Info.Width, codec.Info.Height,
+            SKColorType.Bgra8888, SKAlphaType.Unpremul,
+            codec.Info.ColorSpace);
+        using var bmpFrame = new SKBitmap(decodeInfo);
         var frameIndex = Math.Min(0, options.FrameIndex);
         var codecOption = new SKCodecOptions(frameIndex);
 
-        if (codec.GetPixels(codec.Info, bmpFrame.GetPixels(), codecOption) == SKCodecResult.Success)
+        if (codec.GetPixels(decodeInfo, bmpFrame.GetPixels(), codecOption) == SKCodecResult.Success)
         {
             // 2.1 correct rotation
             if (options.CorrectRotation)
@@ -498,68 +502,102 @@ public static partial class SkiaCodec
     /// Returns a new image with the specified color channels filtered.
     /// Single-channel views (R, G, or B only) are shown as grayscale.
     /// Alpha-only shows the alpha channel as grayscale with opaque output.
+    /// Uses straight (unpremultiplied) channel values; RGB inspection is not
+    /// masked by alpha.
     /// </summary>
     public static SKImage? FilterImageColorChannels(SKImage? imgSrc, ColorChannels colors)
     {
         if (imgSrc.IsDisposed()) return null;
 
-        var redOnly = colors.HasFlag(ColorChannels.R)
-            && !colors.HasFlag(ColorChannels.G)
-            && !colors.HasFlag(ColorChannels.B);
-        var greenOnly = colors.HasFlag(ColorChannels.G)
-            && !colors.HasFlag(ColorChannels.R)
-            && !colors.HasFlag(ColorChannels.B);
-        var blueOnly = colors.HasFlag(ColorChannels.B)
-            && !colors.HasFlag(ColorChannels.G)
-            && !colors.HasFlag(ColorChannels.R);
+        var width = imgSrc.Width;
+        var height = imgSrc.Height;
+        var readInfo = new SKImageInfo(width, height, SKColorType.Bgra8888, SKAlphaType.Unpremul, imgSrc.ColorSpace);
+        using var srcBmp = new SKBitmap(readInfo);
+        if (!imgSrc.ReadPixels(readInfo, srcBmp.GetPixels(), readInfo.RowBytes, 0, 0))
+            return null;
+
+        using var dstBmp = new SKBitmap(readInfo);
+        var srcPixels = srcBmp.GetPixelSpan();
+        var dstPixels = dstBmp.GetPixelSpan();
+
         var alphaOnly = colors == ColorChannels.A;
-        var keepAlpha = colors.HasFlag(ColorChannels.A) && !alphaOnly;
+        var showR = !alphaOnly && colors.HasFlag(ColorChannels.R);
+        var showG = !alphaOnly && colors.HasFlag(ColorChannels.G);
+        var showB = !alphaOnly && colors.HasFlag(ColorChannels.B);
+        var showA = colors.HasFlag(ColorChannels.A);
+        var redOnly = showR && !showG && !showB;
+        var greenOnly = showG && !showR && !showB;
+        var blueOnly = showB && !showR && !showG;
 
-        var red = !alphaOnly && colors.HasFlag(ColorChannels.R) ? 1f : 0f;
-        var green = !alphaOnly && colors.HasFlag(ColorChannels.G) ? 1f : 0f;
-        var blue = !alphaOnly && colors.HasFlag(ColorChannels.B) ? 1f : 0f;
-
-        // for single-channel views, spread the channel value to all RGB outputs
-        var mRed = redOnly ? 1f : 0f;
-        var mGreen = greenOnly ? 1f : 0f;
-        var mBlue = blueOnly ? 1f : 0f;
-
-        // for alpha-only, map alpha to RGB for grayscale visualization
-        var fromAlpha = alphaOnly ? 1f : 0f;
-        var alphaScale = alphaOnly ? 0f : 1f;
-        var alphaOffset = alphaOnly ? 1f : 0f;
-
-        // when alpha channel is not selected and not alpha-only,
-        // blend with black background instead of forcing opaque
-        var blendWithBlack = !keepAlpha && !alphaOnly;
-
-        #pragma warning disable format
-        float[] matrix =
-        [
-            red,    mGreen, mBlue,  fromAlpha,      0,
-            mRed,   green,  mBlue,  fromAlpha,      0,
-            mRed,   mGreen, blue,   fromAlpha,      0,
-            0,      0,      0,      alphaScale,     alphaOffset,
-        ];
-        #pragma warning restore format
-
-        using var paint = new SKPaint
+        for (var i = 0; i < width * height; i++)
         {
-            ColorFilter = SKColorFilter.CreateColorMatrix(matrix),
-        };
+            var o = i * 4;
+            var b = srcPixels[o];
+            var g = srcPixels[o + 1];
+            var r = srcPixels[o + 2];
+            var a = srcPixels[o + 3];
 
-        var info = new SKImageInfo(imgSrc.Width, imgSrc.Height, imgSrc.ColorType, imgSrc.AlphaType, imgSrc.ColorSpace);
-        using var surface = SKSurface.Create(info);
-        if (surface.IsDisposed()) return null;
+            byte dr, dg, db, da;
 
-        // blend transparent pixels with black background
-        if (blendWithBlack)
-        {
-            surface.Canvas.Clear(SKColors.Black);
+            if (alphaOnly)
+            {
+                dr = dg = db = a;
+                da = 255;
+            }
+            else if (redOnly)
+            {
+                dr = dg = db = r;
+                da = showA ? a : (byte)255;
+            }
+            else if (greenOnly)
+            {
+                dr = dg = db = g;
+                da = showA ? a : (byte)255;
+            }
+            else if (blueOnly)
+            {
+                dr = dg = db = b;
+                da = showA ? a : (byte)255;
+            }
+            else
+            {
+                dr = showR ? r : (byte)0;
+                dg = showG ? g : (byte)0;
+                db = showB ? b : (byte)0;
+                da = showA ? a : (byte)255;
+            }
+
+            dstPixels[o] = db;
+            dstPixels[o + 1] = dg;
+            dstPixels[o + 2] = dr;
+            dstPixels[o + 3] = da;
         }
 
-        surface.Canvas.DrawImage(imgSrc, 0, 0, paint);
-        return surface.Snapshot();
+        return SKImage.FromBitmap(dstBmp);
+    }
+
+
+    /// <summary>
+    /// Normalizes an image to straight BGRA8888 (unpremultiplied alpha).
+    /// Returns the same instance when already in that format.
+    /// </summary>
+    public static SKImage? ToStraightUnpremulImage(SKImage? imgSrc)
+    {
+        if (imgSrc.IsDisposed()) return null;
+
+        if (imgSrc.ColorType == SKColorType.Bgra8888
+            && imgSrc.AlphaType is SKAlphaType.Unpremul or SKAlphaType.Opaque)
+        {
+            return imgSrc;
+        }
+
+        var info = new SKImageInfo(
+            imgSrc.Width, imgSrc.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul, imgSrc.ColorSpace);
+        using var bmp = new SKBitmap(info);
+        if (!imgSrc.ReadPixels(info, bmp.GetPixels(), info.RowBytes, 0, 0))
+            return null;
+
+        return SKImage.FromBitmap(bmp);
     }
 
 

@@ -943,6 +943,17 @@ public partial class ViewerControl : PhControl
                     else
                     {
                         _isFirstDraw.SetTrue();
+
+                        if (imgFrame is not null)
+                        {
+                            var straight = SkiaCodec.ToStraightUnpremulImage(imgFrame);
+                            if (straight is not null && !ReferenceEquals(straight, imgFrame))
+                            {
+                                if (!e.Photo.IsClipboard) imgFrame.Dispose();
+                                imgFrame = straight;
+                            }
+                        }
+
                         SKImageRef.Set(ref _imgSource, imgFrame);
                     }
 

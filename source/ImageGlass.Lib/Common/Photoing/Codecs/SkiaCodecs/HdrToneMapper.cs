@@ -398,7 +398,7 @@ public static class HdrToneMapper
         if (linearImg is null) return null;
 
         var finalInfo = new SKImageInfo(linearBmp.Width, linearBmp.Height,
-            SKColorType.Rgba8888, SKAlphaType.Premul, SKColorSpace.CreateSrgb());
+            SKColorType.Rgba8888, SKAlphaType.Unpremul, SKColorSpace.CreateSrgb());
         using var finalSurface = SKSurface.Create(finalInfo);
         if (finalSurface is null) return null;
 
